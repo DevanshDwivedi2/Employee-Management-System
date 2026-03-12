@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Employees</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      padding: 40px;
+    }
+
+    h1 { text-align: center; }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 8px 16px;
+      background: blue;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .filter-box {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-box input,
+    .filter-box select {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .btn-search { padding: 8px 16px; background: blue;  color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .btn-reset  { padding: 8px 16px; background: gray;  color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .btn-export { padding: 8px 16px; background: green; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+
+    .table-box { background: white; border-radius: 8px; overflow: hidden; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th { background: blue; color: white; padding: 10px; text-align: left; }
+    td { padding: 10px; border-bottom: 1px solid #eee; }
+
+    .btn-edit   { background: orange; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
+    .btn-delete { background: red;    color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
+
+    .empty { text-align: center; color: gray; padding: 20px; }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+
+    .popup-box {
+      background: white;
+      padding: 24px;
+      max-width: 380px;
+      margin: 100px auto;
+      border-radius: 8px;
+    }
+
+    .popup label {
+      font-size: 12px;
+      color: gray;
+      margin-bottom: 2px;
+      display: block;
+    }
+
+    .popup input,
+    .popup select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .popup button {
+      width: 100%;
+      padding: 10px;
+      background: blue;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    .btn-cancel { background: gray !important; }
+
+    .readonly-field {
+      background: #f0f0f0 !important;
+      cursor: not-allowed !important;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>All Employees</h1>
+  <a class="back-btn" href="/">+ Add New Employee</a>
+
+  <!-- FILTER BAR -->
+  <div class="filter-box">
+    <input type="text" id="search-name" placeholder="Search by Name">
+    <select id="search-dept">
+      <option value="">-- All Departments --</option>
+      <option>HR</option>
+      <option>Finance</option>
+      <option>Engineering</option>
+      <option>Marketing</option>
+      <option>Sales</option>
+      <option>Operations</option>
+    </select>
+    <button class="btn-search" onclick="applyFilter()">Search</button>
+    <button class="btn-reset"  onclick="resetFilter()">Reset</button>
+    <button class="btn-export" onclick="exportExcel()">Export to Excel</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-box">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Salary</th>
+          <th>DOB</th>
+          <th>Department</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="employeeTable">
+        <tr><td colspan="6" class="empty">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- EDIT POPUP -->
+  <div class="popup" id="popup">
+    <div class="popup-box">
+      <h3>Edit Employee</h3>
+      <input type="hidden" id="edit-id">
+
+      <!-- Name — cannot be changed -->
+      <label>Name (cannot be changed)</label>
+      <input type="text" id="edit-name" class="readonly-field" readonly>
+
+      <!-- Salary — can be changed -->
+      <label>Salary (1 - 1000000)</label>
+      <input type="number" id="edit-salary" placeholder="Salary" min="1" max="1000000">
+
+      <!-- DOB — cannot be changed -->
+      <label>Date of Birth (cannot be changed)</label>
+      <input type="date" id="edit-dob" class="readonly-field" readonly>
+
+      <!-- Department — can be changed -->
+      <label>Department</label>
+      <select id="edit-department">
+        <option value="">-- Select Department --</option>
+        <option>HR</option>
+        <option>Finance</option>
+        <option>Engineering</option>
+        <option>Marketing</option>
+        <option>Sales</option>
+        <option>Operations</option>
+      </select>
+
+      <button onclick="saveUpdate()">Save Changes</button>
+      <button class="btn-cancel" onclick="closePopup()">Cancel</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+    const BASE = window.location.origin;
+    let allEmployees      = [];
+    let filteredEmployees = [];
+
+    window.onload = loadEmployees;
+
+    // GET all employees
+    function loadEmployees() {
+      fetch(BASE + "/employees")
+        .then(res => res.json())
+        .then(data => {
+          allEmployees      = data;
+          filteredEmployees = data;
+          showEmployees(data);
+        });
+    }
+
+    // Show in table
+    function showEmployees(employees) {
+      const table = document.getElementById("employeeTable");
+      if (employees.length === 0) {
+        table.innerHTML = `<tr><td colspan="6" class="empty">No employees found!</td></tr>`;
+        return;
+      }
+      table.innerHTML = employees.map(e => `
+        <tr>
+          <td>${e.id}</td>
+          <td>${e.name}</td>
+          <td>${e.salary}</td>
+          <td>${e.dob}</td>
+          <td>${e.department}</td>
+          <td>
+            <button class="btn-edit"
+              onclick="openPopup(${e.id}, '${e.name}', ${e.salary}, '${e.dob}', '${e.department}')">
+              Edit
+            </button>
+            <button class="btn-delete" onclick="deleteEmployee(${e.id})">
+              Delete
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    // FILTER
+    function applyFilter() {
+      const name = document.getElementById("search-name").value.toLowerCase();
+      const dept = document.getElementById("search-dept").value;
+      filteredEmployees = allEmployees.filter(e => {
+        const matchName = e.name.toLowerCase().includes(name);
+        const matchDept = dept === "" || e.department === dept;
+        return matchName && matchDept;
+      });
+      showEmployees(filteredEmployees);
+    }
+
+    // RESET
+    function resetFilter() {
+      document.getElementById("search-name").value = "";
+      document.getElementById("search-dept").value = "";
+      filteredEmployees = allEmployees;
+      showEmployees(allEmployees);
+    }
+
+    // EXPORT — only filtered data
+    function exportExcel() {
+      if (filteredEmployees.length === 0) {
+        alert("No data to export!");
+        return;
+      }
+      const exportData = filteredEmployees.map(e => ({
+        ID: e.id, Name: e.name, Salary: e.salary, DOB: e.dob, Department: e.department
+      }));
+      const sheet    = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, sheet, "Employees");
+      XLSX.writeFile(workbook, "employees.xlsx");
+    }
+
+    // DELETE
+    function deleteEmployee(id) {
+      if (!confirm("Delete this employee?")) return;
+      fetch(BASE + `/employees/${id}`, { method: "DELETE" })
+        .then(() => loadEmployees());
+    }
+
+    // Open popup — fill fields
+    function openPopup(id, name, salary, dob, department) {
+      document.getElementById("edit-id").value         = id;
+      document.getElementById("edit-name").value       = name;
+      document.getElementById("edit-salary").value     = salary;
+      document.getElementById("edit-dob").value        = dob;
+      document.getElementById("edit-department").value = department;
+      document.getElementById("popup").style.display   = "block";
+    }
+
+    // Close popup
+    function closePopup() {
+      document.getElementById("popup").style.display = "none";
+    }
+
+    // UPDATE — with salary validation
+    function saveUpdate() {
+      const id         = document.getElementById("edit-id").value;
+      const name       = document.getElementById("edit-name").value;
+      const salary     = Number(document.getElementById("edit-salary").value);
+      const dob        = document.getElementById("edit-dob").value;
+      const department = document.getElementById("edit-department").value;
+
+      // Salary validation
+      if (!salary || salary <= 0 || salary > 1000000) {
+        alert("Salary must be between 1 and 1,000,000!");
+        return;
+      }
+
+      // Department validation
+      if (!department) {
+        alert("Please select a department!");
+        return;
+      }
+
+      fetch(BASE + `/employees/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, salary, dob, department })
+      })
+      .then(() => {
+        closePopup();
+        loadEmployees();
+      });
+    }
+  </script>
+
+</body>
+</html>
