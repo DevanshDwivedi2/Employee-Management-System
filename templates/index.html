@@ -2,137 +2,137 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Add Employee</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f2f5;
-      padding: 40px;
-    }
-
-    h1 { text-align: center; }
-
-    .form-box {
-      background: white;
-      padding: 24px;
-      max-width: 400px;
-      margin: 30px auto;
-      border-radius: 8px;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 9px;
-      margin-bottom: 12px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background: blue;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 15px;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-
-    .view-btn {
-      background: green;
-      text-align: center;
-      display: block;
-      padding: 10px;
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-      font-size: 15px;
-    }
-
-    .msg { text-align: center; color: green; margin-top: 10px; }
-  </style>
-</head>
-<body>
-
-  <h1>Employee Management</h1>
-
-  <div class="form-box">
-    <h3>Add New Employee</h3>
-
-    <input type="text"   id="name"   placeholder="Full Name">
-    <input type="number" id="salary" placeholder="Salary">
-    <input type="date"   id="dob">
-
-    <!-- Department Dropdown -->
-    <select id="department">
-      <option value="">-- Select Department --</option>
-      <option>HR</option>
-      <option>Finance</option>
-      <option>Engineering</option>
-      <option>Marketing</option>
-      <option>Sales</option>
-      <option>Operations</option>
-    </select>
-
-    <button onclick="addEmployee()">Add Employee</button>
-    <a class="view-btn" href="/employees-page">View All Employees</a>
-    <p class="msg" id="msg"></p>
-  </div>
-
-  <script>
-    function addEmployee() {
-      const name       = document.getElementById("name").value;
-      const salary     = document.getElementById("salary").value;
-      const dob        = document.getElementById("dob").value;
-      const department = document.getElementById("department").value;
-
-      if (!name || !salary || !department || !dob) {
-  alert("All fields are required!");
-  return;
-}
-
-// Age must be 18 or older
-const today   = new Date();
-const birthDate = new Date(dob);
-let age = today.getFullYear() - birthDate.getFullYear();
-const monthDiff = today.getMonth() - birthDate.getMonth();
-if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-  age--;
-}
-if (age < 18) {
-  alert("Employee must be at least 18 years old!");
-  return;
-}
-
-// Salary must be between 0 and 1000000
-if (salary <= 0 || salary > 1000000) {
-  alert("Salary must be between 1 and 1000000!");
-  return;
-}
-
-      fetch(window.location.origin + "/employees", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, salary, dob, department })
-      })
-      .then(res => res.json())
-      .then(() => {
-        document.getElementById("msg").textContent = "Employee added successfully!";
-        clearForm();
-      });
-    }
-
-    function clearForm() {
-      document.getElementById("name").value       = "";
-      document.getElementById("salary").value     = "";
-      document.getElementById("dob").value        = "";
-      document.getElementById("department").value = "";
-    }
-  </script>
-
-</body>
-</html>
+    <title>Add Employee</title>
+      <style>
+          body {
+                font-family: Arial, sans-serif;
+                      background: #f0f2f5;
+                            padding: 40px;
+                                }
+                                
+                                    h1 { text-align: center; }
+                                    
+                                        .form-box {
+                                              background: white;
+                                                    padding: 24px;
+                                                          max-width: 400px;
+                                                                margin: 30px auto;
+                                                                      border-radius: 8px;
+                                                                          }
+                                                                          
+                                                                              input, select {
+                                                                                    width: 100%;
+                                                                                          padding: 9px;
+                                                                                                margin-bottom: 12px;
+                                                                                                      border: 1px solid #ccc;
+                                                                                                            border-radius: 4px;
+                                                                                                                  font-size: 14px;
+                                                                                                                        box-sizing: border-box;
+                                                                                                                            }
+                                                                                                                            
+                                                                                                                                button {
+                                                                                                                                      width: 100%;
+                                                                                                                                            padding: 10px;
+                                                                                                                                                  background: blue;
+                                                                                                                                                        color: white;
+                                                                                                                                                              border: none;
+                                                                                                                                                                    border-radius: 4px;
+                                                                                                                                                                          font-size: 15px;
+                                                                                                                                                                                cursor: pointer;
+                                                                                                                                                                                      margin-bottom: 10px;
+                                                                                                                                                                                          }
+                                                                                                                                                                                          
+                                                                                                                                                                                              .view-btn {
+                                                                                                                                                                                                    background: green;
+                                                                                                                                                                                                          text-align: center;
+                                                                                                                                                                                                                display: block;
+                                                                                                                                                                                                                      padding: 10px;
+                                                                                                                                                                                                                            color: white;
+                                                                                                                                                                                                                                  text-decoration: none;
+                                                                                                                                                                                                                                        border-radius: 4px;
+                                                                                                                                                                                                                                              font-size: 15px;
+                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                      .msg { text-align: center; color: green; margin-top: 10px; }
+                                                                                                                                                                                                                                                        </style>
+                                                                                                                                                                                                                                                        </head>
+                                                                                                                                                                                                                                                        <body>
+                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                          <h1>Employee Management</h1>
+                                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                            <div class="form-box">
+                                                                                                                                                                                                                                                                <h3>Add New Employee</h3>
+                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                    <input type="text"   id="name"   placeholder="Full Name">
+                                                                                                                                                                                                                                                                        <input type="number" id="salary" placeholder="Salary">
+                                                                                                                                                                                                                                                                            <input type="date"   id="dob">
+                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                <!-- Department Dropdown -->
+                                                                                                                                                                                                                                                                                    <select id="department">
+                                                                                                                                                                                                                                                                                          <option value="">-- Select Department --</option>
+                                                                                                                                                                                                                                                                                                <option>HR</option>
+                                                                                                                                                                                                                                                                                                      <option>Finance</option>
+                                                                                                                                                                                                                                                                                                            <option>Engineering</option>
+                                                                                                                                                                                                                                                                                                                  <option>Marketing</option>
+                                                                                                                                                                                                                                                                                                                        <option>Sales</option>
+                                                                                                                                                                                                                                                                                                                              <option>Operations</option>
+                                                                                                                                                                                                                                                                                                                                  </select>
+                                                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                      <button onclick="addEmployee()">Add Employee</button>
+                                                                                                                                                                                                                                                                                                                                          <a class="view-btn" href="/employees-page">View All Employees</a>
+                                                                                                                                                                                                                                                                                                                                              <p class="msg" id="msg"></p>
+                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                  <script>
+                                                                                                                                                                                                                                                                                                                                                      function addEmployee() {
+                                                                                                                                                                                                                                                                                                                                                            const name       = document.getElementById("name").value;
+                                                                                                                                                                                                                                                                                                                                                                  const salary     = document.getElementById("salary").value;
+                                                                                                                                                                                                                                                                                                                                                                        const dob        = document.getElementById("dob").value;
+                                                                                                                                                                                                                                                                                                                                                                              const department = document.getElementById("department").value;
+                                                                                                                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                                                                                                                    if (!name || !salary || !department || !dob) {
+                                                                                                                                                                                                                                                                                                                                                                                      alert("All fields are required!");
+                                                                                                                                                                                                                                                                                                                                                                                        return;
+                                                                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                        // Age must be 18 or older
+                                                                                                                                                                                                                                                                                                                                                                                        const today   = new Date();
+                                                                                                                                                                                                                                                                                                                                                                                        const birthDate = new Date(dob);
+                                                                                                                                                                                                                                                                                                                                                                                        let age = today.getFullYear() - birthDate.getFullYear();
+                                                                                                                                                                                                                                                                                                                                                                                        const monthDiff = today.getMonth() - birthDate.getMonth();
+                                                                                                                                                                                                                                                                                                                                                                                        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                                                                                                                                                                                                                                                                                                                                                                                          age--;
+                                                                                                                                                                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                                                                                                                                                                          if (age < 18) {
+                                                                                                                                                                                                                                                                                                                                                                                            alert("Employee must be at least 18 years old!");
+                                                                                                                                                                                                                                                                                                                                                                                              return;
+                                                                                                                                                                                                                                                                                                                                                                                              }
+                                                                                                                                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                                                                                                                              // Salary must be between 0 and 1000000
+                                                                                                                                                                                                                                                                                                                                                                                              if (salary <= 0 || salary > 1000000) {
+                                                                                                                                                                                                                                                                                                                                                                                                alert("Salary must be between 1 and 1000000!");
+                                                                                                                                                                                                                                                                                                                                                                                                  return;
+                                                                                                                                                                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                                                                                        fetch(window.location.origin + "/employees", {
+                                                                                                                                                                                                                                                                                                                                                                                                                method: "POST",
+                                                                                                                                                                                                                                                                                                                                                                                                                        headers: { "Content-Type": "application/json" },
+                                                                                                                                                                                                                                                                                                                                                                                                                                body: JSON.stringify({ name, salary, dob, department })
+                                                                                                                                                                                                                                                                                                                                                                                                                                      })
+                                                                                                                                                                                                                                                                                                                                                                                                                                            .then(res => res.json())
+                                                                                                                                                                                                                                                                                                                                                                                                                                                  .then(() => {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                          document.getElementById("msg").textContent = "Employee added successfully!";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                  clearForm();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                function clearForm() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      document.getElementById("name").value       = "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            document.getElementById("salary").value     = "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  document.getElementById("dob").value        = "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        document.getElementById("department").value = "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </script>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </body>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </html>>

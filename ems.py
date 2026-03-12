@@ -67,3 +67,4 @@ def delete_employee(id):
 
 if __name__ == "__main__":
     app.run(debug=True)
+app.config["MYSQL_PASSWORD"] = "1234"
